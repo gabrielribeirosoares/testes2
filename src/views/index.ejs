@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SaaS Conciliação Bancária - Node.js</title>
+  <link rel="stylesheet" href="/assets/styles.css" />
+</head>
+<body>
+  <main class="wrap">
+    <h1>SaaS de Conciliação Bancária (Questor)</h1>
+    <p class="muted">Stack moderna com Node.js + Express para importação, conciliação e exportação.</p>
+
+    <% if (message) { %>
+      <div class="flash <%= type === 'error' ? 'flash-error' : 'flash-success' %>"><%= message %></div>
+    <% } %>
+
+    <section class="grid metrics">
+      <article class="card"><span>Pendentes</span><strong><%= pendentes %></strong></article>
+      <article class="card"><span>Conciliados</span><strong><%= conciliados %></strong></article>
+      <article class="card"><span>Extrato sem match</span><strong><%= extratoSemMatch %></strong></article>
+    </section>
+
+    <section class="card">
+      <h2>Importações</h2>
+      <div class="grid cols-2">
+        <div>
+          <h3>Questor CSV</h3>
+          <p class="muted">data_lancamento,documento,descricao,valor,tipo,conta</p>
+          <form action="/import/questor" method="post" enctype="multipart/form-data">
+            <input type="file" name="arquivo" accept=".csv" required />
+            <button>Importar Questor</button>
+          </form>
+        </div>
+        <div>
+          <h3>Extrato CSV</h3>
+          <p class="muted">data_movimento,historico,valor,conta,doc_ref</p>
+          <form action="/import/extrato" method="post" enctype="multipart/form-data">
+            <input type="file" name="arquivo" accept=".csv" required />
+            <button>Importar Extrato</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Conciliação manual</h2>
+      <form action="/conciliar" method="post" class="inline">
+        <select name="lancamento_id" required>
+          <option value="">Selecione lançamento</option>
+          <% lancamentos.forEach((l) => { %>
+            <option value="<%= l.id %>">#<%= l.id %> | <%= l.data_lancamento %> | <%= l.descricao %> | R$ <%= Number(l.valor).toFixed(2) %></option>
+          <% }) %>
+        </select>
+
+        <select name="extrato_id" required>
+          <option value="">Selecione extrato</option>
+          <% extratos.forEach((e) => { %>
+            <option value="<%= e.id %>">#<%= e.id %> | <%= e.data_movimento %> | <%= e.historico %> | R$ <%= Number(e.valor).toFixed(2) %></option>
+          <% }) %>
+        </select>
+
+        <select name="status" required>
+          <option value="CONCILIADO">CONCILIADO</option>
+          <option value="DIVERGENTE">DIVERGENTE</option>
+        </select>
+
+        <button>Salvar Conciliação</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Exportação</h2>
+      <a class="button" href="/export/questor">Baixar CSV de retorno Questor</a>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,17 @@
+:root { font-family: Inter, Arial, sans-serif; }
+body { margin: 0; background: #f2f5fb; color: #182230; }
+.wrap { max-width: 1120px; margin: 24px auto; padding: 0 16px; }
+.card { background: #fff; border-radius: 12px; padding: 16px; box-shadow: 0 1px 5px rgba(0,0,0,.08); margin-bottom: 16px; }
+.grid { display: grid; gap: 12px; }
+.metrics { grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); }
+.cols-2 { grid-template-columns: 1fr 1fr; }
+@media (max-width: 900px) { .cols-2 { grid-template-columns: 1fr; } }
+form.inline { display: grid; gap: 8px; grid-template-columns: 2fr 2fr 1fr auto; }
+@media (max-width: 900px) { form.inline { grid-template-columns: 1fr; } }
+input, select, button, .button { padding: 10px; border: 1px solid #d0d5dd; border-radius: 8px; font-size: 14px; }
+button, .button { background: #175cd3; color: #fff; border: none; cursor: pointer; text-decoration: none; display: inline-block; }
+.muted { color: #475467; }
+.flash { border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; }
+.flash-success { background: #ecfdf3; color: #027a48; border: 1px solid #6ce9a6; }
+.flash-error { background: #fef3f2; color: #b42318; border: 1px solid #fda29b; }
+strong { display:block; font-size: 26px; margin-top: 6px; }
