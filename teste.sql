@@ -1,70 +1,46 @@
--- phpMyAdmin SQL Dump
--- version 5.2.1
--- https://www.phpmyadmin.net/
---
--- Host: 127.0.0.1
--- Tempo de geração: 12/04/2024 às 18:27
--- Versão do servidor: 10.4.32-MariaDB
--- Versão do PHP: 8.2.12
+CREATE DATABASE IF NOT EXISTS teste CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE teste;
 
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "+00:00";
+CREATE TABLE IF NOT EXISTS lancamentos_empresa (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  data_lancamento DATE NOT NULL,
+  documento VARCHAR(50) NOT NULL,
+  descricao VARCHAR(255) NOT NULL,
+  valor DECIMAL(12,2) NOT NULL,
+  tipo ENUM('CREDITO','DEBITO') NOT NULL,
+  conta VARCHAR(30) NOT NULL,
+  status_conciliacao ENUM('PENDENTE','CONCILIADO','DIVERGENTE') NOT NULL DEFAULT 'PENDENTE',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
+CREATE TABLE IF NOT EXISTS extrato_bancario (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  data_movimento DATE NOT NULL,
+  historico VARCHAR(255) NOT NULL,
+  valor DECIMAL(12,2) NOT NULL,
+  conta VARCHAR(30) NOT NULL,
+  doc_ref VARCHAR(50) DEFAULT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
+CREATE TABLE IF NOT EXISTS conciliacoes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  lancamento_id INT NOT NULL,
+  extrato_id INT NOT NULL,
+  status ENUM('CONCILIADO','DIVERGENTE') NOT NULL,
+  data_conciliacao DATETIME NOT NULL,
+  CONSTRAINT fk_conc_lanc FOREIGN KEY (lancamento_id) REFERENCES lancamentos_empresa(id),
+  CONSTRAINT fk_conc_ext FOREIGN KEY (extrato_id) REFERENCES extrato_bancario(id),
+  CONSTRAINT uk_conc_lanc UNIQUE (lancamento_id),
+  CONSTRAINT uk_conc_ext UNIQUE (extrato_id)
+);
 
---
--- Banco de dados: `teste`
---
+INSERT INTO lancamentos_empresa (data_lancamento, documento, descricao, valor, tipo, conta)
+VALUES
+('2026-04-01', 'DOC001', 'Pagamento fornecedor XPTO', 1500.00, 'DEBITO', '341-001'),
+('2026-04-02', 'DOC002', 'Recebimento cliente ABC', 2850.50, 'CREDITO', '341-001');
 
--- --------------------------------------------------------
-
---
--- Estrutura para tabela `users`
---
-
-CREATE TABLE `users` (
-  `id_user` int(11) NOT NULL,
-  `nome` varchar(50) NOT NULL,
-  `email` varchar(120) NOT NULL,
-  `idade` date NOT NULL,
-  `cidade` varchar(50) NOT NULL,
-  `estado` varchar(20) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Despejando dados para a tabela `users`
---
-
-INSERT INTO `users` (`id_user`, `nome`, `email`, `idade`, `cidade`, `estado`) VALUES
-(1, 'Gabriel', 'gabrielribeirosoares@hotmail.com', '2000-03-21', 'Garopaba', 'Santa Catarina'),
-(2, 'Eduarda', 'eduardafalcaosebastiao@hotmail.com', '2003-04-15', 'Garopaba', 'Santa Catarina');
-
---
--- Índices para tabelas despejadas
---
-
---
--- Índices de tabela `users`
---
-ALTER TABLE `users`
-  ADD PRIMARY KEY (`id_user`);
-
---
--- AUTO_INCREMENT para tabelas despejadas
---
-
---
--- AUTO_INCREMENT de tabela `users`
---
-ALTER TABLE `users`
-  MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
-COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+INSERT INTO extrato_bancario (data_movimento, historico, valor, conta, doc_ref)
+VALUES
+('2026-04-01', 'TED Fornecedor XPTO', 1500.00, '341-001', 'DOC001'),
+('2026-04-02', 'PIX Cliente ABC', 2850.50, '341-001', 'DOC002');
